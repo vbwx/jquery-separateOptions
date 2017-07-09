@@ -1,5 +1,5 @@
 // jQuery separateOptions plugin
-// Copyright (C) 2013 Bernhard Waldbrunner
+// Copyright (C) 2013-2017 Bernhard Waldbrunner
 /*
  *	This program is free software: you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by
@@ -15,34 +15,32 @@
  *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-(function ($) {
-$(function ()
-{
-	$('select').separateOptions();
-});
+(function($) {
+	$.fn.separateOptions = function() {
+		return this.each(function() {
+			var $el = $(this), max = 0, opt = [], sep = "";
 
-$.fn.separateOptions = function () {
-	return this.each(function () {
-		var $el = $(this);
-		var max = 0, opt = [];
-		$el.find('option').each(function () {
-			var $o = $(this);
-			var text = $o.text();
-			if (text == '--' || $o.attr('data-sep'))
-				opt.push(this);
-			var len = text.length -
-					  text.replace(/[^lijftrI.:,!'"`|[\]]/g, "").length / 2;
-			if (len > max)
-				max = len;
+			$el.find('option').each(function() {
+				var $o = $(this), text = $o.text(), len;
+				if (text === '' || $o.attr('label') === '--') {
+					opt.push(this);
+				}
+				else {
+					len = text.length - text.replace(/[^lijftrI.:,!'"`|[\]]/g, "").length / 2;
+					if (len > max) {
+						max = len;
+					}
+				}
+			});
+			if (!opt.length) {
+				return;
+			}
+			for (var i = 0; i < Math.ceil(max); i++) {
+				sep += "&ndash;";
+			}
+			$.each(opt, function () {
+				$(this).text('').attr('label', sep).prop('disabled', true).addClass('separator');
+			});
 		});
-		if (opt.length == 0)
-			return;
-		var sep = "";
-		for (var i = 0; i < Math.ceil(max); i++)
-			sep += "&ndash;";
-		$.each(opt, function () {
-			$(this).html(sep).attr('data-sep', 1);
-		});
-	});
-}
+	};
 })(jQuery);
